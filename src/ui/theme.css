@@ -1,0 +1,38 @@
+/* Global design tokens. Editor and UI component styles live in their own files. */
+:root {
+  --bg: #07060d;
+  --bg-2: #0d0b18;
+  --panel: rgba(20, 17, 36, 0.86);
+  --panel-solid: #141124;
+  --panel-2: #1b1730;
+  --line: rgba(170, 150, 255, 0.14);
+  --line-2: rgba(170, 150, 255, 0.28);
+  --text: #ece8ff;
+  --text-dim: #a79fcc;
+  --text-faint: #6f6895;
+  --accent: #b78cff;
+  --accent-2: #66e0ff;
+  --gold: #ffd27a;
+  --danger: #ff5c7a;
+  --warn: #ffb84d;
+  --ok: #5dffa8;
+  --radius: 10px;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: radial-gradient(1200px 700px at 70% -10%, #1d1240 0%, transparent 60%), radial-gradient(900px 600px at -10% 110%, #0c2a3a 0%, transparent 55%), var(--bg);
+  color: var(--text);
+  font: 13px/1.4 var(--font);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+::selection { background: rgba(183, 140, 255, 0.35); }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: rgba(183, 140, 255, 0.22); border-radius: 9px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
