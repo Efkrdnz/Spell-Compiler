@@ -94,8 +94,7 @@ export class Engine {
   private statAcc = 0;
   private lastDamage: Record<Element, number> = Object.fromEntries(ELEMENTS.map((e) => [e, 0])) as Record<Element, number>;
   private lastHeal = 0;
-  private stepsAcc = 0;
-  private manaAcc = 0;
+  private lastSteps = 0;
   stats: StatSample[] = [];
   message: { text: string; t: number } | null = null;
   private resizeObs: ResizeObserver | null = null;
@@ -287,7 +286,6 @@ export class Engine {
 
   private sampleStats(dt: number): void {
     this.statAcc += dt;
-    this.stepsAcc += this.rt.totals.steps;
     if (this.statAcc < 0.25) return;
     const s = this.world.stats;
     const dps = {} as Record<Element, number>;
@@ -301,8 +299,8 @@ export class Engine {
     this.lastHeal = s.healing;
     const spent = this.rt.manaSpentTick / this.statAcc;
     this.rt.manaSpentTick = 0;
-    const steps = (this.rt.totals.steps - this.manaAcc) / this.statAcc;
-    this.manaAcc = this.rt.totals.steps;
+    const steps = Math.max(0, this.rt.totals.steps - this.lastSteps) / this.statAcc; // totals may be reset from the profiler
+    this.lastSteps = this.rt.totals.steps;
     this.stats.push({
       t: this.world.time,
       dps,
@@ -318,7 +316,6 @@ export class Engine {
     });
     if (this.stats.length > 240) this.stats.splice(0, this.stats.length - 240);
     this.statAcc = 0;
-    this.stepsAcc = 0;
     this.notify();
   }
 

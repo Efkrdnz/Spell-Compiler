@@ -280,7 +280,6 @@ export class SpellRuntime {
       const old = [...this.instances.values()].filter((i) => i.dead || now - i.lastActive > 30).slice(0, this.instances.size - 300);
       for (const i of old) this.instances.delete(i.id);
     }
-    this.totals.steps += this.tickSteps;
   }
 
   reset(): void {
@@ -403,6 +402,7 @@ export class SpellRuntime {
     run.steps++;
     inst.steps++;
     this.tickSteps++;
+    this.totals.steps++;
     if (run.steps > run.limit) this.budgetExceeded(frame, n, run);
     if (inst.steps > this.settings.instanceBudget) {
       run.aborted = true;

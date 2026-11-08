@@ -115,6 +115,7 @@
 
 /* ── Dock ──────────────────────────────────────────────────────────────── */
 .dock { flex: none; height: 210px; display: flex; flex-direction: column; border-top: 1px solid var(--line); background: rgba(9, 7, 18, 0.88); }
+.dock.tall { height: 330px; }
 .dock.closed { height: 34px; }
 .dock-tabs { display: flex; align-items: center; gap: 2px; padding: 0 6px; height: 34px; flex: none; border-bottom: 1px solid var(--line); }
 .dock-tabs > button:not(.dock-toggle) { border: 0; background: transparent; color: var(--text-dim); padding: 6px 12px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; font-size: 12.5px; }
@@ -148,10 +149,10 @@
 .trow.k-defer { color: var(--warn); }
 .trow.k-exec .t-kind { color: var(--text-faint); }
 
-.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; padding: 8px 10px; }
-.kpi { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); border-radius: 9px; padding: 6px 9px; display: flex; flex-direction: column; }
-.kpi b { font-family: var(--mono); font-size: 15px; font-weight: 500; }
-.kpi span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 5px; padding: 8px 10px; }
+.kpi { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; display: flex; flex-direction: column; min-width: 0; }
+.kpi b { font-family: var(--mono); font-size: 14px; font-weight: 500; }
+.kpi span { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
 .kpi.warn b { color: var(--warn); }
 .ptable, .etable { width: 100%; border-collapse: collapse; font-size: 12px; }
 .ptable th { text-align: left; font-weight: 500; color: var(--text-faint); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 10px; border-bottom: 1px solid var(--line); }
@@ -204,6 +205,7 @@
 .bp-card .card-text, .preset-card .card-text { padding: 12px 12px 0; }
 .card h3 { margin: 0 0 4px; font-size: 14.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .card p { margin: 0 0 8px; color: var(--text-dim); font-size: 12px; line-height: 1.45; }
+.card-foot { margin-top: 8px; font-size: 11.5px; color: #cdbfff; font-family: var(--mono); }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .chip { font-size: 10.5px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--text-dim); font-family: var(--mono); white-space: nowrap; }
 .chip.el { color: var(--el); border-color: color-mix(in srgb, var(--el) 45%, transparent); }

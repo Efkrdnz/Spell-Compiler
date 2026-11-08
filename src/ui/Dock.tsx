@@ -19,7 +19,7 @@ export function Dock() {
   const errs = compiled?.diagnostics.filter((d) => d.severity === 'error').length ?? 0;
   const warns = compiled?.diagnostics.filter((d) => d.severity === 'warning').length ?? 0;
   return (
-    <div className={`dock${ui.dockOpen ? '' : ' closed'}`}>
+    <div className={`dock${ui.dockOpen ? '' : ' closed'}${ui.dock === 'stats' || ui.dock === 'profiler' ? ' tall' : ''}`}>
       <div className="dock-tabs">
         {TABS.map((t) => (
           <button key={t.id} className={ui.dock === t.id && ui.dockOpen ? 'on' : ''} onClick={() => setUI({ dock: t.id, dockOpen: true })} data-testid={`dock-${t.id}`}>

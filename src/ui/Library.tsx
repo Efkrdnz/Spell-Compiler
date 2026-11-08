@@ -47,7 +47,7 @@ export function LibraryModal() {
   );
 }
 
-function SpellCard({ doc, children, onOpen }: { doc: SpellDoc; children?: React.ReactNode; onOpen?: () => void }) {
+function SpellCard({ doc, children, onOpen, footnote }: { doc: SpellDoc; children?: React.ReactNode; onOpen?: () => void; footnote?: string }) {
   const compiled = useStore((s) => s.compiled[doc.id]);
   const c = compiled ?? compileSpell(doc);
   const el = ELEMENT_INFO[doc.element];
@@ -77,6 +77,7 @@ function SpellCard({ doc, children, onOpen }: { doc: SpellDoc; children?: React.
             {c.recursive && <span className="chip">recursive</span>}
             {doc.subspells.length > 0 && <span className="chip">{doc.subspells.length} subspell{doc.subspells.length > 1 ? 's' : ''}</span>}
           </div>
+          {footnote && <div className="card-foot">⟡ {footnote}</div>}
         </div>
       </button>
       {children && <div className="card-actions">{children}</div>}
@@ -163,8 +164,7 @@ function Examples() {
   return (
     <div className="grid">
       {EXAMPLES.map((ex) => (
-        <SpellCard key={ex.id} doc={ex.doc}>
-          <span className="dim small">{ex.summary}</span>
+        <SpellCard key={ex.id} doc={ex.doc} footnote={ex.summary}>
           <span className="tflex" />
           <button
             className="tbtn"
