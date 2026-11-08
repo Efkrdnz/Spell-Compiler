@@ -50,6 +50,8 @@ export interface StoreState {
   toasts: Toast[];
   hotbar: (string | null)[];
   revision: number;
+  /** request for the editor to select + centre a node (seq bumps on every request) */
+  focus: { graphId: string; nodeId: string; seq: number } | null;
 
   active(): SpellDoc;
   activeGraph(): SpellGraph;
@@ -73,6 +75,7 @@ export interface StoreState {
   toast(text: string, kind?: Toast['kind']): void;
   dismissToast(id: number): void;
   setHotbar(slot: number, id: string | null): void;
+  requestFocus(graphId: string, nodeId: string): void;
 }
 
 const LS_KEY = 'spell-compiler/library/v1';
@@ -223,6 +226,7 @@ export const useStore = create<StoreState>((set, get) => {
     toasts: [],
     hotbar,
     revision: 0,
+    focus: null,
 
     active() {
       const s = get();
@@ -410,6 +414,12 @@ export const useStore = create<StoreState>((set, get) => {
     },
     dismissToast(id) {
       set({ toasts: get().toasts.filter((t) => t.id !== id) });
+    },
+    requestFocus(graphId, nodeId) {
+      const s = get();
+      const doc = s.active();
+      if (graphId !== 'main' && !doc.subspells.some((g) => g.id === graphId)) return;
+      set({ graphId, focus: { graphId, nodeId, seq: (s.focus?.seq ?? 0) + 1 }, selection: [nodeId] });
     },
     setHotbar(slot, id) {
       const hotbar = [...get().hotbar];
