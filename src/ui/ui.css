@@ -114,7 +114,7 @@
 .slot-name { position: absolute; left: 0; right: 0; bottom: 2px; font-size: 8.5px; color: #e9e4ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 3px; text-shadow: 0 1px 2px #000; z-index: 2; }
 
 /* ── Dock ──────────────────────────────────────────────────────────────── */
-.dock { flex: none; height: 230px; display: flex; flex-direction: column; border-top: 1px solid var(--line); background: rgba(9, 7, 18, 0.88); }
+.dock { flex: none; height: 210px; display: flex; flex-direction: column; border-top: 1px solid var(--line); background: rgba(9, 7, 18, 0.88); }
 .dock.closed { height: 34px; }
 .dock-tabs { display: flex; align-items: center; gap: 2px; padding: 0 6px; height: 34px; flex: none; border-bottom: 1px solid var(--line); }
 .dock-tabs > button:not(.dock-toggle) { border: 0; background: transparent; color: var(--text-dim); padding: 6px 12px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; font-size: 12.5px; }

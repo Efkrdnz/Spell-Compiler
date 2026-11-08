@@ -1050,8 +1050,8 @@
   border-right: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(20, 17, 36, 0.92), rgba(12, 10, 22, 0.94));
 }
-.se-pal--collapsed,
-.se-insp--collapsed {
+.se-pal.se-pal--collapsed,
+.se-insp.se-insp--collapsed {
   width: 38px;
   align-items: center;
   padding-top: 8px;

@@ -157,6 +157,18 @@ function EditorInner() {
   const [palOpen, setPalOpen] = useState(() => lsBool('se/palette', true));
   const [inspOpen, setInspOpen] = useState(() => lsBool('se/inspector', true));
   const [snap, setSnap] = useState(() => lsBool('se/snap', false));
+  // In a narrow pane (e.g. split view) the inspector starts collapsed so the canvas keeps room.
+  const [paneWidth, setPaneWidth] = useState(1400);
+  const [inspNarrowOpen, setInspNarrowOpen] = useState(false);
+  const narrow = paneWidth < 1080;
+  const inspVisible = narrow ? inspNarrowOpen : inspOpen;
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setPaneWidth(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const [quick, setQuick] = useState<{ x: number; y: number; flow: Vec; pending?: Pending } | null>(null);
   const [nodes, setNodes] = useState<SpellFlowNode[]>([]);
   const [edges, setEdges] = useState<SpellFlowEdge[]>([]);
@@ -519,12 +531,13 @@ function EditorInner() {
   const nodesReady = useNodesInitialized();
   const fitOnGraphChange = useRef('');
   useEffect(() => {
-    const key = `${doc.id}|${graphId}`;
+    // also refit when the layout mode flips (narrow ↔ wide) or the inspector opens/closes
+    const key = `${doc.id}|${graphId}|${narrow}|${inspVisible}|${palOpen}`;
     if (fitOnGraphChange.current === key || !nodesReady || !nodes.length) return;
     if (!nodes.some((n) => graph.nodes[0] && n.id === graph.nodes[0].id)) return;
     fitOnGraphChange.current = key;
     setTimeout(() => rf.fitView({ padding: 0.14, maxZoom: 1.05, duration: 0 }), 40);
-  }, [doc.id, graphId, nodes, nodesReady, rf, graph]);
+  }, [doc.id, graphId, nodes, nodesReady, rf, graph, narrow, inspVisible, palOpen]);
 
   const empty = graph.nodes.length === 0;
 
@@ -595,6 +608,7 @@ function EditorInner() {
               pannable
               zoomable
               className="se-minimap"
+              style={{ width: narrow ? 120 : 170, height: narrow ? 80 : 110 }}
               nodeColor={(n) => {
                 const def = getDef((n as SpellFlowNode).data?.node?.type ?? '');
                 return def ? CATEGORY_INFO[def.category].color : '#555';
@@ -668,10 +682,13 @@ function EditorInner() {
         </div>
       </div>
       <Inspector
-        collapsed={!inspOpen}
+        collapsed={!inspVisible}
         onToggle={() => {
-          lsSetBool('se/inspector', !inspOpen);
-          setInspOpen(!inspOpen);
+          if (narrow) setInspNarrowOpen(!inspNarrowOpen);
+          else {
+            lsSetBool('se/inspector', !inspOpen);
+            setInspOpen(!inspOpen);
+          }
         }}
       />
     </div>
