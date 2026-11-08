@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spell Compiler · VFX Lab</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #06050b; color: #ece8ff; font: 12px/1.4 Inter, system-ui, sans-serif; overflow: hidden; }
+      #stage { position: absolute; inset: 0; }
+      canvas { display: block; outline: none; }
+      #hud { position: absolute; left: 10px; top: 10px; padding: 8px 10px; background: rgba(14, 11, 26, 0.82); border: 1px solid rgba(170, 150, 255, 0.25); border-radius: 8px; font-family: ui-monospace, Menlo, monospace; white-space: pre; pointer-events: none; }
+      #bar { position: absolute; right: 10px; top: 10px; display: flex; flex-wrap: wrap; gap: 4px; max-width: 60%; justify-content: flex-end; }
+      #bar button { background: rgba(30, 24, 52, 0.9); border: 1px solid rgba(170, 150, 255, 0.3); color: #ece8ff; border-radius: 6px; padding: 3px 7px; cursor: pointer; font-size: 11px; }
+      #bar button:hover { background: rgba(60, 44, 110, 0.9); }
+    </style>
+  </head>
+  <body>
+    <div id="stage"><canvas id="c" tabindex="0"></canvas></div>
+    <div id="hud"></div>
+    <div id="bar"></div>
+    <script type="module" src="/src/render/lab.ts"></script>
+  </body>
+</html>

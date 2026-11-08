@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { V } from '../src/core/types';
 import { circleBox, circleCircle, rayBox, rayCircle } from '../src/sim/physics';
-import { spawnProjectile, createField } from '../src/sim/magic';
+import { spawnProjectile, createField, summon } from '../src/sim/magic';
 import { Mat } from '../src/sim/terrain';
 import { World } from '../src/sim/world';
 import { buildPreset, PRESETS } from '../src/sim/presets';
@@ -71,6 +71,17 @@ describe('bodies & projectiles', () => {
     expect(b.hp).toBeLessThan(b.maxHp);
     expect(p.alive).toBe(false);
     expect(w.entities.has(p.id)).toBe(false);
+  });
+
+  it('wisp summons orbit their owner (regression: immovable orbiters must still move)', () => {
+    const w = new World();
+    const c = w.spawn('caster', { x: 400, y: 400 });
+    const wisp = summon(w, { kind: 'wisp', pos: { x: 400, y: 400 }, element: 'arcane', duration: 10, damage: 5, attackRate: 1, range: 300, ownerId: c.id, instance: 1 })!;
+    run(w, 0.5);
+    const a = { ...wisp.pos };
+    run(w, 0.5);
+    expect(V.dist(wisp.pos, a)).toBeGreaterThan(20);
+    expect(V.dist(wisp.pos, c.pos)).toBeLessThan(70);
   });
 
   it('gravity fields bend projectile paths', () => {

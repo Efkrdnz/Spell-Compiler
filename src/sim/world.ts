@@ -748,12 +748,14 @@ export class World {
   private integrate(dt: number): void {
     const T = this.terrain;
     for (const e of this.list) {
-      if (!e.alive || e.invMass <= 0 || e.proj || e.beam || e.field) continue;
+      if (!e.alive || e.proj || e.beam || e.field) continue;
+      // orbiters are driven kinematically, even immovable ones like wisps
       if (e.orbit) {
         e.pos.x += e.vel.x * dt;
         e.pos.y += e.vel.y * dt;
         continue;
       }
+      if (e.invMass <= 0) continue;
       const m = T.at(e.pos);
       let damp = e.damping;
       if (m === Mat.Ice || m === Mat.Oil) damp *= 0.18;

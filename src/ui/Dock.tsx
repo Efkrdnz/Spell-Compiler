@@ -84,7 +84,6 @@ function Trace() {
   useEngineTick(5);
   const engine = getEngine();
   const activeId = useStore((s) => s.activeId);
-  const focus = useStore((s) => s.requestFocus);
   const [onlyThis, setOnlyThis] = useState(true);
   const [showExec, setShowExec] = useState(true);
   const [frozen, setFrozen] = useState<typeof engine.rt.trace | null>(null);
@@ -139,7 +138,19 @@ function Trace() {
       <div className="trace-rows" data-testid="trace-rows">
         {rows.length === 0 && <div className="empty">Cast a spell to see its execution here: every node that runs, every event the arena raises, every fizzle and why.</div>}
         {rows.map((t) => (
-          <button key={t.seq} className={`trow k-${t.kind}`} onClick={() => t.nodeId && t.spellId === activeId && focus(t.graphId, t.nodeId)}>
+          <button
+            key={t.seq}
+            className={`trow k-${t.kind}`}
+            onClick={() => {
+              if (!t.nodeId) return;
+              const st = useStore.getState();
+              if (t.spellId !== activeId) {
+                if (!st.library.some((d) => d.id === t.spellId)) return;
+                st.setActive(t.spellId);
+              }
+              st.requestFocus(t.graphId, t.nodeId);
+            }}
+          >
             <span className="t-time">{t.t.toFixed(2)}s</span>
             <span className="t-kind">{KIND_LABEL[t.kind]}</span>
             <span className="t-inst">#{t.instance}</span>

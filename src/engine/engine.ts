@@ -38,6 +38,8 @@ export interface RendererLike {
   resize(view: View): void;
   render(world: World, frame: FrameInfo): void;
   dispose(): void;
+  /** drop transient visuals (particles, trails) after the arena is rebuilt */
+  reset?(): void;
 }
 
 export interface StatSample {
@@ -158,6 +160,7 @@ export class Engine {
     if (cfg) this.arenaConfig = { ...this.arenaConfig, ...cfg };
     this.rt.reset();
     buildPreset(this.world, id, this.arenaConfig);
+    this.renderer?.reset?.();
     this.lastDamage = Object.fromEntries(ELEMENTS.map((e) => [e, 0])) as Record<Element, number>;
     this.lastHeal = 0;
     this.stats = [];
