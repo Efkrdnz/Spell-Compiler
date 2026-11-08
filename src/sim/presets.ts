@@ -40,6 +40,14 @@ function enemy(w: World, p: Vec, behavior: AIBehavior, cfg: ArenaConfig, element
     respawn: cfg.respawn ? { pos: V.copy(p), delay: 4, t: 0 } : undefined,
   });
   if (behavior === 'ranged') e.r = 14;
+  // elemental foes resist their own element and are weak to its opposite
+  const RESIST: Partial<Record<Entity['element'], Partial<Record<Entity['element'], number>>>> = {
+    fire: { fire: 0.25, ice: 1.6 },
+    ice: { ice: 0.25, fire: 1.6 },
+    lightning: { lightning: 0.25, force: 1.4 },
+    void: { void: 0.25, life: 1.8 },
+  };
+  e.resist = { ...(RESIST[element] ?? {}) };
   return e;
 }
 
@@ -96,7 +104,7 @@ export const PRESETS: ArenaPreset[] = [
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2;
         const p = { x: 800 + Math.cos(a) * 640, y: 450 + Math.sin(a) * 380 };
-        enemy(w, w.clampToArena(p, 30), pickBehavior(cfg, i), cfg, i % 5 === 0 ? 'fire' : 'arcane');
+        enemy(w, w.clampToArena(p, 30), pickBehavior(cfg, i), cfg, i % 5 === 0 ? 'fire' : i % 7 === 3 ? 'ice' : 'arcane');
       }
       w.spawn('pillar', { x: 560, y: 300 });
       w.spawn('pillar', { x: 1040, y: 600 });
@@ -160,7 +168,7 @@ export const PRESETS: ArenaPreset[] = [
   {
     id: 'gauntlet',
     name: 'Shooting Gallery',
-    description: 'Fast patrolling targets behind cover. Test homing, bouncing and piercing spells.',
+    description: 'Fast patrolling targets behind cover, with spike strips. Test homing, bouncing, piercing and knockback spells.',
     build(w, cfg) {
       caster(w);
       for (let i = 0; i < 4; i++) wall(w, 700, 150 + i * 200, 14, 50);
@@ -171,6 +179,9 @@ export const PRESETS: ArenaPreset[] = [
       patrolTarget(w, [{ x: 1200, y: 200 }, { x: 1450, y: 450 }, { x: 1200, y: 700 }, { x: 950, y: 450 }], 180, cfg);
       patrolTarget(w, [{ x: 1300, y: 450 }, { x: 1300, y: 120 }], 160, cfg);
       for (let i = 0; i < 3; i++) dummy(w, { x: 1520, y: 300 + i * 150 }, 300);
+      // spike strips: shove foes onto them
+      w.terrain.paintRect(820, 400, 1180, 500, Mat.Spikes);
+      w.terrain.paintRect(1240, 40, 1560, 80, Mat.Spikes);
     },
   },
   {
@@ -208,13 +219,14 @@ export const SPAWNABLES: { kind: string; label: string }[] = [
   { kind: 'paint:oil', label: 'Oil' },
   { kind: 'paint:grass', label: 'Grass' },
   { kind: 'paint:lava', label: 'Lava' },
+  { kind: 'paint:spikes', label: 'Spikes' },
   { kind: 'paint:floor', label: 'Erase' },
 ];
 
 export function spawnAt(w: World, kind: string, p: Vec, cfg: ArenaConfig = DEFAULT_ARENA_CONFIG): Entity | null {
   if (kind.startsWith('paint:')) {
     const m = kind.slice(6);
-    const map: Record<string, Mat> = { water: Mat.Water, oil: Mat.Oil, grass: Mat.Grass, lava: Mat.Lava, floor: Mat.Floor };
+    const map: Record<string, Mat> = { water: Mat.Water, oil: Mat.Oil, grass: Mat.Grass, lava: Mat.Lava, spikes: Mat.Spikes, floor: Mat.Floor };
     w.terrain.paintCircle(p, 40, map[m] ?? Mat.Floor);
     return null;
   }
