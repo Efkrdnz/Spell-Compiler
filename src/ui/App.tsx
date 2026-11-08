@@ -154,18 +154,19 @@ function TopBar() {
       <div className="seg" role="group" aria-label="Layout">
         {(['editor', 'split', 'arena'] as Layout[]).map((l) => (
           <button key={l} className={ui.layout === l ? 'on' : ''} onClick={() => st().setUI({ layout: l })} title={`${l} layout`}>
-            {l === 'editor' ? '◧ Editor' : l === 'split' ? '◫ Split' : '◨ Arena'}
+            {l === 'editor' ? '◧' : l === 'split' ? '◫' : '◨'}
+            <span className="lbl"> {l[0].toUpperCase() + l.slice(1)}</span>
           </button>
         ))}
       </div>
-      <button className="btn" onClick={() => st().setUI({ libraryOpen: true, libraryTab: 'mine' })} data-testid="open-library">
-        ❖ Grimoire
+      <button className="btn" onClick={() => st().setUI({ libraryOpen: true, libraryTab: 'mine' })} data-testid="open-library" title="Grimoire: your spells, examples, blueprints, experiments">
+        ❖<span className="lbl"> Grimoire</span>
       </button>
-      <button className="btn" onClick={() => st().setUI({ ioOpen: true })} data-testid="open-io">
-        ⇅ Import / Export
+      <button className="btn" onClick={() => st().setUI({ ioOpen: true })} data-testid="open-io" title="Import / export spells and share links">
+        ⇅<span className="lbl"> Import / Export</span>
       </button>
       <button className="btn" onClick={async () => st().toast((await copyText(shareUrl())) ? 'Share link copied to clipboard' : 'Clipboard blocked — use Import / Export', 'success')} title="Copy a link containing this spell">
-        ⤴ Share
+        ⤴<span className="lbl"> Share</span>
       </button>
       <button className="btn icon" onClick={() => st().setUI({ helpOpen: true })} title="How it works">
         ?

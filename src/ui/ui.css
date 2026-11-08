@@ -234,7 +234,12 @@ kbd { font: 11px var(--mono); padding: 2px 6px; border-radius: 5px; border: 1px 
 .toast.success { border-color: rgba(93, 255, 168, 0.45); }
 
 /* ── Layout variants ───────────────────────────────────────────────────── */
-.layout-arena .pane-arena .dock { height: 200px; }
+.layout-arena .pane-arena .dock:not(.closed):not(.tall) { height: 200px; }
+@media (max-width: 1560px) {
+  .topbar .lbl { display: none; }
+  .topbar { gap: 8px; }
+  .spell-name { width: 140px; }
+}
 @media (max-width: 1100px) {
   .metrics { display: none; }
   .charts { grid-template-columns: 1fr; }

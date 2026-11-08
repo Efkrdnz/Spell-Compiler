@@ -487,8 +487,14 @@ export class World {
     e.vel.y *= 0.1;
   }
 
+  private lastReaction = new Map<string, { t: number; p: Vec }>();
+
   reaction(p: Vec, text: string, color: string): void {
     this.stats.reactions++;
+    // many targets reacting at once would stack identical labels: show one per area
+    const last = this.lastReaction.get(text);
+    if (last && this.time - last.t < 0.6 && V.dist(last.p, p) < 160) return;
+    this.lastReaction.set(text, { t: this.time, p: V.copy(p) });
     this.emit({ type: 'text', pos: { x: p.x, y: p.y - 28 }, text, color });
   }
 
