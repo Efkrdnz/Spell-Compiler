@@ -516,16 +516,18 @@ export const EFFECT_NODES: NodeDef[] = [
       },
     ],
     inputs: [P.exec(), P.ents('targets', 'Targets'), P.num('duration', 'Duration', 5, { min: 0.5, max: 60 }), P.elem('element', 'Element', 'arcane')],
-    outputs: [P.then(), P.out('changed', 'Changed', 'number')],
+    outputs: [P.then(), P.out('results', 'Results', 'entities', { doc: 'The transmuted entities (material changes create new ones).' }), P.out('changed', 'Changed', 'number')],
     exec: (c) => {
       const ents = livingEnts(c, 'targets');
       const dur = clamp(c.num('duration'), 0.5, 60);
-      let n = 0;
+      const out: EntityId[] = [];
       for (const e of ents) {
         if (!c.charge(COSTS.transmute(1, dur), 'transmute')) break;
-        if (transmute(c.world, e, String(c.param('into')) as TransmuteInto, dur, c.elem('element'))) n++;
+        const r = transmute(c.world, e, String(c.param('into')) as TransmuteInto, dur, c.elem('element'));
+        if (r) out.push(r.id);
       }
-      c.set('changed', n);
+      c.set('results', out);
+      c.set('changed', out.length);
       c.fire('then');
     },
   },

@@ -235,12 +235,13 @@ export function duplicate(w: World, e: Entity, count: number, spreadDeg: number,
 
 export type TransmuteInto = 'sheep' | 'crate' | 'barrel' | 'iceblock' | 'boulder' | 'element';
 
-export function transmute(w: World, e: Entity, into: TransmuteInto, duration: number, element: Element): boolean {
-  if (!e.alive || e.kind === 'caster' || e.kind === 'pillar') return false;
+/** Returns the transmuted entity (a new one for material changes), or null if immune. */
+export function transmute(w: World, e: Entity, into: TransmuteInto, duration: number, element: Element): Entity | null {
+  if (!e.alive || e.kind === 'caster' || e.kind === 'pillar') return null;
   if (into === 'element' || e.kind === 'projectile' || e.kind === 'field' || e.kind === 'beam' || e.kind === 'summon') {
     e.element = element;
     w.emit({ type: 'transmute', pos: V.copy(e.pos), radius: Math.max(14, e.r * 1.6), element });
-    return true;
+    return e;
   }
   const living = w.isLiving(e);
   if (living && into === 'sheep') {
@@ -263,7 +264,7 @@ export function transmute(w: World, e: Entity, into: TransmuteInto, duration: nu
       wanderDir: V.fromAngle(w.random() * 6.28),
     };
     w.emit({ type: 'transmute', pos: V.copy(e.pos), radius: 30, element: 'arcane' });
-    return true;
+    return e;
   }
   // permanent material transmutation
   const kind: EntityKind = into === 'sheep' ? 'sheep' : into;
@@ -279,7 +280,7 @@ export function transmute(w: World, e: Entity, into: TransmuteInto, duration: nu
   n.hp = Math.max(1, n.maxHp * hpFrac);
   if (kind === 'iceblock') n.life = clamp(duration, 1, 60);
   w.emit({ type: 'transmute', pos, radius: 34, element });
-  return true;
+  return n;
 }
 
 export interface Hop {

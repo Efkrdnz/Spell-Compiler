@@ -403,12 +403,7 @@ export class SpellRuntime {
     run.steps++;
     inst.steps++;
     this.tickSteps++;
-    if (run.steps > run.limit) {
-      run.aborted = true;
-      this.totals.budgetHits++;
-      this.fizzleAt(frame, n, `Execution budget exceeded (${run.limit} steps in one burst) at ${n.title}. Loops this big need a Delay or Every between passes.`, 'error');
-      throw new Abort();
-    }
+    if (run.steps > run.limit) this.budgetExceeded(frame, n, run);
     if (inst.steps > this.settings.instanceBudget) {
       run.aborted = true;
       this.killInstance(inst, `lifetime step budget (${this.settings.instanceBudget}) exhausted`);
@@ -444,6 +439,13 @@ export class SpellRuntime {
       this.fizzleAt(frame, n, `${n.title} failed: ${(e as Error).message}`, 'error');
     }
     this.closeTiming(prof, t0, outerChild);
+  }
+
+  budgetExceeded(frame: Frame, n: CNode, run: Run): never {
+    run.aborted = true;
+    this.totals.budgetHits++;
+    this.fizzleAt(frame, n, `Execution budget exceeded (${run.limit} steps in one burst) at ${n.title}. Loops this big need a Delay or Every between passes.`, 'error');
+    throw new Abort();
   }
 
   private closeTiming(prof: NodeProfile, t0: number, outerChild: number): void {
@@ -528,7 +530,7 @@ export class SpellRuntime {
     return outs;
   }
 
-  charge(frame: Frame, amount: number, prof: NodeProfile | null, what: string): boolean {
+  charge(frame: Frame, amount: number, prof: NodeProfile | null, what: string, run?: Run): boolean {
     if (amount <= 0) return true;
     const inst = frame.inst;
     if (!this.settings.infiniteMana) {
@@ -537,7 +539,11 @@ export class SpellRuntime {
       if (!pool || pool.cur < amount) {
         if (what) {
           this.world.emit({ type: 'fizzle', pos: caster ? V.copy(caster.pos) : this.world.posOf(inst.casterId), reason: 'Out of mana' });
-          this.fizzleAt(frame, prof ? frame.g.nodes[frame.g.byId.get(prof.nodeId)!] : undefined, `Out of mana: ${what} needed ${amount.toFixed(1)}`);
+          this.fizzleAt(frame, prof ? frame.g.nodes[frame.g.byId.get(prof.nodeId)!] : undefined, `Out of mana: ${what} needed ${amount.toFixed(1)} — the flow stops here`);
+          if (run) {
+            run.aborted = true;
+            throw new Abort();
+          }
         }
         return false;
       }
@@ -639,7 +645,7 @@ export class SpellRuntime {
       this.fizzleAt(frame, caller, `Recursion limit (${this.settings.maxDepth}) reached casting “${spell.doc.name}”`);
       return;
     }
-    if (!this.charge(frame, spell.upfront, null, `cast ${spell.doc.name}`)) return;
+    if (!this.charge(frame, spell.upfront, null, `cast ${spell.doc.name}`, run)) return;
     const inst = this.newInstance(spell, frame.ctx.casterId, frame.inst.id);
     inst.upfront = spell.upfront;
     const ctx: CastContext = { casterId: frame.ctx.casterId, origin: V.copy(origin), target: V.copy(target), aim: V.norm(V.sub(target, origin)) };
@@ -786,7 +792,7 @@ class Ctx implements ExecCtx {
     return this.rt.schedule(this.frame, this.n.idx, port, seconds, binds);
   }
   charge(amount: number, what = ''): boolean {
-    return this.rt.charge(this.frame, amount, this.prof, what);
+    return this.rt.charge(this.frame, amount, this.prof, what, this.run);
   }
   fizzle(reason: string): void {
     this.rt.fizzleAt(this.frame, this.n, reason);
@@ -808,6 +814,8 @@ class Ctx implements ExecCtx {
     this.rt.castSpell(this.frame, this.n, spellId, origin, target, this.run);
   }
   budgetOk(): boolean {
-    return !this.run.aborted && this.run.steps < this.run.limit;
+    if (this.run.aborted) throw new Abort();
+    if (this.run.steps >= this.run.limit) this.rt.budgetExceeded(this.frame, this.n, this.run);
+    return true;
   }
 }
