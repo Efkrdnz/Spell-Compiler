@@ -1,5 +1,7 @@
 # Spell Compiler
 
+**Play it in your browser: https://efkrdnz.github.io/Spell-Compiler/**
+
 A browser magic sandbox where you **invent spells by programming them** as typed
 node graphs. Graphs are compiled (validated, type-checked, scope-analysed,
 costed) and run by an event-driven interpreter that drives a 2D physics arena
